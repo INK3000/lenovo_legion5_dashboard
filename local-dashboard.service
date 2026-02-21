@@ -1,0 +1,17 @@
+[Unit]
+Description=Local Battery Dashboard
+After=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/python3 -m local_dashboard
+Environment=PYTHONPATH=/usr/local/lib
+Environment=DASH_HOST=127.0.0.1
+Environment=DASH_PORT=47652
+Environment=BATTERY_NAME=BAT0
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
