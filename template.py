@@ -4,8 +4,45 @@ HTML = r"""<!doctype html>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Local Dashboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* Local fonts — served from /static/fonts/ if available */
+    @font-face {
+      font-family: 'IBM Plex Mono';
+      font-style: normal; font-weight: 400;
+      src: url('/static/fonts/IBMPlexMono-Regular.woff2') format('woff2');
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'IBM Plex Mono';
+      font-style: normal; font-weight: 500;
+      src: url('/static/fonts/IBMPlexMono-Medium.woff2') format('woff2');
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'IBM Plex Mono';
+      font-style: normal; font-weight: 600;
+      src: url('/static/fonts/IBMPlexMono-SemiBold.woff2') format('woff2');
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'IBM Plex Sans';
+      font-style: normal; font-weight: 400;
+      src: url('/static/fonts/IBMPlexSans-Regular.woff2') format('woff2');
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'IBM Plex Sans';
+      font-style: normal; font-weight: 500;
+      src: url('/static/fonts/IBMPlexSans-Medium.woff2') format('woff2');
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'IBM Plex Sans';
+      font-style: normal; font-weight: 600;
+      src: url('/static/fonts/IBMPlexSans-SemiBold.woff2') format('woff2');
+      font-display: swap;
+    }
+  </style>
   <script>
     // Use local Tailwind if available, fallback to CDN
     (function() {
