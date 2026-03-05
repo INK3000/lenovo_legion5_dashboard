@@ -194,7 +194,7 @@ HTML = r"""<!doctype html>
   <div id="panel-battery">
 
   <!-- KPI row —  cards -->
-  <div class="grid grid-cols-3 gap-2 mb-2 sm:grid-cols-5">
+  <div class="grid grid-cols-2 gap-2 mb-2 sm:grid-cols-3 xl:grid-cols-6">
 
     <div class="bg-panel border border-border rounded-lg px-3 py-2.5 flex flex-col gap-1">
       <div class="text-label text-xs font-mono uppercase tracking-widest leading-none">Charge</div>
@@ -227,6 +227,11 @@ HTML = r"""<!doctype html>
         <div class="kpi-val text-text" id="kpiEta">—</div>
         <div class="text-muted text-xs font-mono" id="kpiEtaLabel"></div>
       </div>
+    </div>
+
+    <div class="bg-panel border border-border rounded-lg px-3 py-2.5 flex flex-col gap-1">
+      <div class="text-label text-xs font-mono uppercase tracking-widest leading-none">Last Discharge</div>
+      <div class="kpi-val text-text text-sm" id="kpiLastDischarge">—</div>
     </div>
 
   </div>
@@ -384,6 +389,37 @@ function fmtEta(hours, status) {
   if (s.includes('discharg'))  label = 'until empty';
   else if (s.includes('charg')) label = 'until full';
   return {val, label};
+}
+
+function fmtDuration(seconds) {
+  if (seconds < 60) return '<1m';
+  const totalMin = Math.floor(seconds / 60);
+  const d = Math.floor(totalMin / 1440);
+  const h = Math.floor((totalMin % 1440) / 60);
+  const m = totalMin % 60;
+  if (d > 0) return h > 0 ? `${d}d ${h}h` : `${d}d`;
+  if (h > 0) return m > 0 ? `${h}h ${m}m` : `${h}h`;
+  return `${m}m`;
+}
+
+function currentDischargeInfo(points) {
+  if (!points || points.length === 0) return null;
+  const last = points[points.length - 1];
+  if (statusClass(last.status || '') !== 'discharging') return null;
+
+  let startIdx = points.length - 1;
+  while (startIdx > 0 && statusClass(points[startIdx - 1].status || '') === 'discharging') {
+    startIdx -= 1;
+  }
+
+  const startTs = points[startIdx].t;
+  const endTs = last.t;
+  if (typeof startTs !== 'number' || typeof endTs !== 'number') return null;
+
+  return {
+    startTs,
+    durationSec: Math.max(0, endTs - startTs),
+  };
 }
 
 // ── Canvas chart ──────────────────────────────────────────────────────────────
@@ -594,6 +630,15 @@ async function refresh() {
       const eta = fmtEta(j.latest.eta, j.latest.status || '');
       document.getElementById('kpiEta').textContent = eta.val;
       document.getElementById('kpiEtaLabel').textContent = eta.label;
+    }
+
+    const lastDischargeEl = document.getElementById('kpiLastDischarge');
+    const discharge = currentDischargeInfo(j.points || []);
+    if (discharge) {
+      const since = new Date(discharge.startTs * 1000).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+      lastDischargeEl.textContent = `since ${since} · ${fmtDuration(discharge.durationSec)}`;
+    } else {
+      lastDischargeEl.textContent = '—';
     }
 
     document.getElementById('kpiWindow').textContent = `${j.points.length} samples`;
